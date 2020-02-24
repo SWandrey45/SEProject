@@ -18,6 +18,7 @@ import time
 from IPython.display import display
 import mysql.connector
 
+#set up the database connection
 URI = "database-1.cx36tayg9smy.us-east-1.rds.amazonaws.com"
 PORT = "3306"
 DB = "SE_Project"
@@ -26,11 +27,13 @@ PASSWORD = "liamstacy"
 
 engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASSWORD, URI, PORT, DB), echo=True)
 
-APIKEY="eb2ccb1179e38c5251aac92c5182497cd4e7222d"
+#Retreive the json data
+APIKEY = "eb2ccb1179e38c5251aac92c5182497cd4e7222d"
 NAME = "Dublin"
-STATIONS_URI="https://api.jcdecaux.com/vls/v1/stations"
+STATIONS_URI = "https://api.jcdecaux.com/vls/v1/stations"
 
-r = requests.get(STATIONS_URI, params={"apikey": APIKEY, "contract": NAME})
+r = requests.get(STATIONS_URI, params={"apiKey": APIKEY, "contract": NAME})
+pprint(r)
 
 sql =  """CREATE TABLE IF NOT EXISTS DynamicBike (
         available_bike_stands INTEGER,
@@ -52,13 +55,15 @@ except Exception as e:
 def dynamic_bikes(text):
     DynamicBikes = json.loads(text)
     for DynamicBike in DynamicBikes:
-        vals =  DynamicBike.get("available_bike_stands"),
-        int(DynamicBike.get("bike_stands")),
+        vals =  (DynamicBike.get("available_bike_stands"),
         int(DynamicBike.get("available_bikes")),
+        int(DynamicBike.get("bike_stands")),
         DynamicBike.get("name"),
         int(DynamicBike.get("number")),
-        DynamicBike.get("status"),
-        DynamicBike.get("last_update")
+        DynamicBike.get("last_update"),
+        DynamicBike.get("status"))
         
-        engine.execute("insert into DynamicBikes values(%s, %s, %s, %s, %s, %s, %s)", vals)
+        engine.execute("insert into DynamicBike values(%s, %s, %s, %s, %s, %s, %s)", vals)
     return
+
+dynamic_bikes(r.text)
