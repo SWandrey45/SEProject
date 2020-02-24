@@ -17,7 +17,7 @@ from IPython.display import display
 import mysql.connector
 
 
-response = requests.get("https://api.openweathermap.org/data/2.5/weather?q=Dublin,IE&APPID=2a2021764b2563bfa694c9146727bc6c")
+#response = requests.get("https://api.openweathermap.org/data/2.5/weather?q=Dublin,IE&APPID=2a2021764b2563bfa694c9146727bc6c")
 
 
 #set up the database connection
@@ -31,13 +31,14 @@ engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASS
 
 # #Retreive the json data
 APIKEY = "2a2021764b2563bfa694c9146727bc6c"
-NAME = "Dublin"
+NAME = "Dublin,IE"
 WEATHER_URI = "https://api.openweathermap.org/data/2.5/weather"
 
 
-r = requests.get(WEATHER_URI, params={"apiKey": APIKEY, "contract": NAME})
+r = requests.get(WEATHER_URI, params={"q": NAME, "APPID": APIKEY})
+#pprint(r.text)
 
-#Create the Stations table
+#Create the Weather table
 sql = """CREATE TABLE IF NOT EXISTS Weather (
         Temp INTEGER,
         Description VARCHAR(45),
@@ -54,11 +55,11 @@ except Exception as e:
 #create a function to insert the data to the table
 def Weather_to_db(text):
     weathers = json.loads(text)
-    for Weather in weathers:
-        vals = int(Weather.get("Temp"), Weather.get("Description"), Weather.get("ICON"), Weather.get("City"))
+    
+    vals = (int(weathers.get("main").get("temp")), weathers.get("weather")[0].get("description"), weathers.get("weather")[0].get("icon"), weathers.get("name"))
         
-        engine.execute("insert into Weather values(%s, %s, %s, %s)", vals)
-        #break
+    engine.execute("insert into Weather values(%s, %s, %s, %s)", vals)
+    #break
     return
-
-# Weather_to_db(r.text)
+   
+Weather_to_db(r.text)
