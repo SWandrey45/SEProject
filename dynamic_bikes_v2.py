@@ -1,10 +1,3 @@
-'''Here is my scraper for the dynamic bikes, it is also giving the error "This result object does not return rows. 
-It has been closed automatically". I have tried to research this to find out how to fix it and I am going crazy! Not sure what's
-missing? 
-What does this mean, how can we fix it? thanks for taking a peak!!"
-
-'''
-
 
 import requests
 import json
