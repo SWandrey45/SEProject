@@ -1,9 +1,3 @@
-'''Here is my edited version of Liam's weather scraper! It is making the table and naming the columns, but it keeps returning 
-The error 'This result object does not return rows. It has been closed automatically.' Not sure why it's not getting the JSON
-Correctly? Any thoughts? also how many times do we want to run this? 
-'''
-
-
 import sqlalchemy as sqla
 from sqlalchemy import create_engine
 import traceback
@@ -15,10 +9,7 @@ import requests
 import time
 from IPython.display import display
 import mysql.connector
-
-
-#response = requests.get("https://api.openweathermap.org/data/2.5/weather?q=Dublin,IE&APPID=2a2021764b2563bfa694c9146727bc6c")
-
+from datetime import datetime
 
 #set up the database connection
 URI = "database-1.cx36tayg9smy.us-east-1.rds.amazonaws.com"
@@ -33,20 +24,23 @@ engine = create_engine("mysql+mysqlconnector://{}:{}@{}:{}/{}".format(USER, PASS
 APIKEY = "2a2021764b2563bfa694c9146727bc6c"
 NAME = "Dublin,IE"
 WEATHER_URI = "https://api.openweathermap.org/data/2.5/weather"
-
-
-r = requests.get(WEATHER_URI, params={"q": NAME, "APPID": APIKEY})
-#pprint(r.text)
+UNITS = "metric"
 
 #Create the Weather table
 sql = """CREATE TABLE IF NOT EXISTS Weather (
-        Temp INTEGER,
-        Description VARCHAR(45),
-        Icon VARCHAR(45),
-        City VARCHAR(45))"""
+        date_update DATE NOT NULL,
+        time_update TIME NOT NULL,
+        temp REAL,
+        humidity REAL,
+        description VARCHAR(45),
+        icon VARCHAR(45),
+        city VARCHAR(45),
+        wind_speed REAL,
+        wind_direction REAL,
+        PRIMARY KEY(date_update, time_update))"""
 
 try:
-    res = engine.execute("DROP TABLE IF EXISTS Weather")
+    #res = engine.execute("DROP TABLE IF EXISTS Weather")
     res = engine.execute(sql)
     print(res.fetchall())
 except Exception as e:
@@ -56,10 +50,20 @@ except Exception as e:
 def Weather_to_db(text):
     weathers = json.loads(text)
     
-    vals = (int(weathers.get("main").get("temp")), weathers.get("weather")[0].get("description"), weathers.get("weather")[0].get("icon"), weathers.get("name"))
+    vals = (datetime.now(), datetime.now(), weathers.get("main").get("temp"), weathers.get("main").get("humidity"), 
+            weathers.get("weather")[0].get("description"), weathers.get("weather")[0].get("icon"), weathers.get("name"),
+           weathers.get("wind").get("speed"), weathers.get("wind").get("deg"))
         
-    engine.execute("insert into Weather values(%s, %s, %s, %s)", vals)
+    engine.execute("insert into Weather values(%s, %s, %s, %s, %s, %s, %s, %s, %s)", vals)
     #break
     return
-   
-Weather_to_db(r.text)
+while True:
+    try:
+        r = requests.get(WEATHER_URI, params={"q": NAME, "APPID": APIKEY, "units": UNITS})
+        Weather_to_db(r.text)
+        
+        #sleep for 5 mins
+        time.sleep(5*60)
+    except Exception as e:
+        #If there is a problem print traceback
+        print(e)
