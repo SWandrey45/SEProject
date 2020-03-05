@@ -61,13 +61,10 @@ def dynamic_bikes(text):
         engine.execute("insert into DynamicBike values(%s, %s, %s, %s, %s, %s, %s, %s)", vals)
     return
 
-while True:
-    try:
-        r = requests.get(STATIONS_URI, params={"apiKey": APIKEY, "contract": NAME})
-        dynamic_bikes(r.text)
-        
-        #sleep for 5 mins
-        time.sleep(5*60)
-    except Exception as e:
-        #If there is a problem print traceback
-        print(e)
+
+try:
+    r = requests.get(STATIONS_URI, params={"apiKey": APIKEY, "contract": NAME})
+    dynamic_bikes(r.text)
+except Exception as e:
+    #If there is a problem print traceback
+    print(e)
