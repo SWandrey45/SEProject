@@ -57,13 +57,11 @@ def Weather_to_db(text):
     engine.execute("insert into Weather values(%s, %s, %s, %s, %s, %s, %s, %s, %s)", vals)
     #break
     return
-while True:
-    try:
-        r = requests.get(WEATHER_URI, params={"q": NAME, "APPID": APIKEY, "units": UNITS})
-        Weather_to_db(r.text)
+
+try:
+    r = requests.get(WEATHER_URI, params={"q": NAME, "APPID": APIKEY, "units": UNITS})
+    Weather_to_db(r.text)
         
-        #sleep for 5 mins
-        time.sleep(5*60)
-    except Exception as e:
-        #If there is a problem print traceback
-        print(e)
+except Exception as e:
+    #If there is a problem print traceback
+    print(e)
