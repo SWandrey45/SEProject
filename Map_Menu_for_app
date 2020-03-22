@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset= "utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dublin Bikes</title>
+        <style>
+            #map {
+                height: 400px;
+                width: 100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <header></header>
+        <h3>Dublin Bikes</h3>
+        <div id="map"></div>
+    <select id="dropdown"></select>
+        <button onclick="DisplayStationInfo()">Submit</button>
+    <p id="info"></p>
+
+    </body>
+        <script>
+
+
+            var sel = document.getElementById('dropdown');
+            var opt = null;
+            var data = JSON.parse({{data | tojson}});
+            // console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                var station_name = data[i].name;
+                console.log(station_name)
+                    opt = document.createElement('option');
+                    opt.value = data[i].id;
+                    opt.innerHTML = data[i].name;
+                    sel.appendChild(opt);
+            }
+            var button = document.getElementById('info');
+            for (var i = 0; i < data.length; i++) {
+                var station_number = data[i].number;
+                console.log(station_number)
+                }
+             function DisplayStationInfo(){
+                document.getElementById('info').innerHTML = station_number;
+                }
+
+            // Initialize and add the map
+            function initMap() {
+            // The location of Dublin
+            var dublin = {lat: 53.350140, lng: -6.266155};
+            // The map, centered at Dublin
+            var map = new google.maps.Map(
+            document.getElementById('map'), {zoom: 14, center: dublin});
+            // The marker, positioned at Dublin
+            var marker = new google.maps.Marker({position: dublin, map: map});
+            }
+        </script>
+        <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
+        </script>
+
+</html>
