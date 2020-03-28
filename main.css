@@ -14,6 +14,20 @@
      margin: 5px;
      border-radius: 50px;
  }
+ p {
+    font-family: arial;
+ }
+
+ div {
+    font-family: arial;
+ }
+ center {
+    font-family: arial;
+ }
+ select {
+    font-family: arial;
+ }
+
 ul {
   list-style-type: none;
   margin: 0;
@@ -64,7 +78,7 @@ li a:hover {
   transition-duration: 0.4s;
 }
 
-.DDM {
+.dropdown {
   background-color: #374785;
   border-radius: 50px;
   border: none;
