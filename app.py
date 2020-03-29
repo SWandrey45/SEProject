@@ -15,7 +15,7 @@ def Menu():
         charset='utf8mb4',
     )
     mycursor = mydb.cursor(dictionary=True)
-    mycursor.execute("SELECT number, name FROM DynamicBike GROUP BY number")
+    mycursor.execute("SELECT * FROM station GROUP BY number")
     # data = mycursor.fetchall()
     data = []
     for i in mycursor:
