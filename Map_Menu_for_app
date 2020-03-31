@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dublin Bikes</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
 
     <body>
@@ -21,18 +22,36 @@
     <select class="DDM" id="dropdown"></select>
         <button class="button button1" onclick="DisplayStationInfo()">Submit</button>
     <p id="info"></p>
+    <div id="curve_chart"></div>
             </center>
 
     </body>
         <script>
 
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+            
+            function drawChart(d) {
+            var data = google.visualization.arrayToDataTable(d);
 
+            var options = {
+            title: 'Predicted availability at different times',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+            chart.draw(data, options);
+            }
+            
             var sel = document.getElementById('dropdown');
             var opt = null;
             var data = JSON.parse({{data | tojson}});
-	    var weather = document.getElementById('weather');
-	    var w = JSON.parse({{data_weather | tojson}});
-            weather.innerHTML = "Temperature: " + w[0].temp + " Humidity: " + w[0].humidity + " Description: " + w[0].description + " wind speed: " + w[0].wind_speed	
+	        var weather = document.getElementById('weather');
+	        var w = JSON.parse({{data_weather | tojson}});
+            weather.innerHTML = "Temperature: " + w[0].temp + " Humidity: " + w[0].humidity + " Description: " + w[0].description + " wind speed: " + w[0].wind_speed;
+            var graph_data = JSON.parse({{data_graph | tojson}});
             console.log(data);
             for (var i = 0; i < data.length; i++) {
                 var station_name = data[i].name;
@@ -68,7 +87,17 @@
                 var result = stations.options[stations.selectedIndex].text;
 
                 document.getElementById("info").innerHTML = "Station number: " + value;
+                 
+                var graph = [["Time", "Available Bikes", "Available Stands"]];
+                for (var i = 0; i < graph_data.length; i++){
+                    if (graph_data[i].number == value){
+                        console.log(graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands)
+                        graph.push([graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands]) ;   
+                    }
+                    
                 }
+                 drawChart(graph)
+             }
             // Initialize and add the map
 
 
@@ -102,3 +131,4 @@
         </script>
 
 </html>
+

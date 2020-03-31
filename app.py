@@ -35,7 +35,7 @@ def Menu():
     data_weather = json.dumps(data_weather)
 
     mycursor = mydb.cursor(dictionary=True)
-    mycursor.execute("SELECT g.number, g.name, g.time_update, avg(g.available_bikes) as average_available_bikes, avg(g.available_bike_stands) as average_available_stands FROM SE_Project.Graph g group by g.number, g.name, g.time_update;")
+    mycursor.execute("SELECT * FROM SE_Project.Graph;")
     # data = mycursor.fetchall()
     data_graph = []
     for i in mycursor:
