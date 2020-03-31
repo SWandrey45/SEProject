@@ -34,8 +34,17 @@ def Menu():
     mycursor.close()
     data_weather = json.dumps(data_weather)
 
-    print(data)
-    return render_template('Map_Menu_for_app.html', data=data, data_weather=data_weather)
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute("SELECT g.number, g.name, g.time_update, avg(g.available_bikes) as average_available_bikes, avg(g.available_bike_stands) as average_available_stands FROM SE_Project.Graph g group by g.number, g.name, g.time_update;")
+    # data = mycursor.fetchall()
+    data_graph = []
+    for i in mycursor:
+        data_graph.append(dict(i))
+        # print(i)
+    mycursor.close()
+    data_graph = json.dumps(data_graph)
+
+    return render_template('Map_Menu_for_app.html', data=data, data_weather=data_weather, data_graph=data_graph)
 
 if __name__ == "__main__":
     app.run(debug=True)
