@@ -15,6 +15,7 @@
   <li><a href="https://www.visitdublin.com/cycle-dublin-in-a-day">Cycling Route in Dublin</a></li>
 </ul>
         <h3>Dublin Bikes</h3>
+	<div id="weather"></div>
         <div id="map"></div>
         <center>
     <select class="DDM" id="dropdown"></select>
@@ -29,6 +30,9 @@
             var sel = document.getElementById('dropdown');
             var opt = null;
             var data = JSON.parse({{data | tojson}});
+	    var weather = document.getElementById('weather');
+	    var w = JSON.parse({{data_weather | tojson}});
+            weather.innerHTML = "Temperature: " + w[0].temp + " Humidity: " + w[0].humidity + " Description: " + w[0].description + " wind speed: " + w[0].wind_speed	
             console.log(data);
             for (var i = 0; i < data.length; i++) {
                 var station_name = data[i].name;
@@ -75,16 +79,20 @@
             var map = new google.maps.Map(
             document.getElementById('map'), {zoom: 14, center: dublin});
             // The marker, positioned at Dublin
-            var marker = new google.maps.Marker({position: dublin, map: map});
+            //var marker = new google.maps.Marker({position: dublin, map: map});
             for (var i = 0; i < data.length; i++) {
-                var markers = new google.maps.Marker({position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),  map:map, title: data[i].name});
+                var marker = new google.maps.Marker({position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng), map: map, title: data[i].name});
                 var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Station Status</b>: "+ data[i].status;
-                var infowindow = new google.maps.InfoWindow({ content: content });
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                    });
-
+                infoWind(marker, content);
             }
+            }
+            
+            function infoWind(marker, info){
+                var infowindow = new google.maps.InfoWindow({content: info});
+
+                marker.addListener('click', function() {
+                infowindow.open(marker.get('map'), marker);
+                });
             }
 
 
