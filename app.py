@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 import mysql.connector
-import json
+import simplejson as json
 
 app = Flask(__name__)
 
