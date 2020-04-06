@@ -52,7 +52,9 @@
             var data = JSON.parse({{data | tojson}});
 	        var weather = document.getElementById('weather');
 	        var w = JSON.parse({{data_weather | tojson}});
-            weather.innerHTML = "Temperature: " + w[0].temp + " Humidity: " + w[0].humidity + " Description: " + w[0].description + " wind speed: " + w[0].wind_speed;
+		var iconCode = w[0].icon;
+            document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+            weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
             var graph_data = JSON.parse({{data_graph | tojson}});
             console.log(data);
             for (var i = 0; i < data.length; i++) {
@@ -70,13 +72,6 @@
             }
 
             var button = document.getElementById('info');
-
-            for (var i = 0; i < data.length; i++) {
-                var station_number = data[i].number;
-                var station_address = data[i].address;
-                var station_status = data[i].status;
-                console.log(station_number, station_address, station_status)
-                }
              function DisplayStationInfo(){
 
                 var stations = document.getElementById("dropdown");
