@@ -30,8 +30,8 @@
 
 ul {
   list-style-type: none;
-  margin: 0;
-  padding: 0;
+  margin: 15;
+  padding: 15;
   overflow: hidden;
   background-color: #24305E;
   border-radius: 50px;
@@ -41,6 +41,8 @@ li {
   float: left;
   border-radius: 50px;
   border-radius: 50px;
+  padding: 10;
+  margin: 10;
 }
 
 li a {
@@ -91,10 +93,26 @@ li a:hover {
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
-  -webkit-transition-duration: 0.4s; /* Safari */
+  -webkit-transition-duration: 0.4s;
   transition-duration: 0.4s;
 
 }
 body {
 background-color: #A8D0E6;
+}
+
+.weather {
+    font-family: arial;
+    color: white;
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    float: right;
+}
+#pic{
+ width: 60px;
+ height: 60px;
+ background-color: #75b4d7;
+ border-radius: 60px;
+ text-align: center;
 }
