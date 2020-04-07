@@ -148,7 +148,7 @@
                           url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
                         }
                         });
-                        var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Station Status</b>: "+ data[i].status;
+                        var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Station Status</b>: "+ data[i].status + " <b>Bikes Available</b>: " + data[i].available_bikes + " <b>Available Bike Stands</b>: " + data[i].available_bike_stands + " <b>Total Bike Stands</b>: " + data[i].bike_stands;
                         infoWind(marker, content);
                  }
             }
