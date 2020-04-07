@@ -113,7 +113,7 @@
             //var marker = new google.maps.Marker({position: dublin, map: map});
             for (var i = 0; i < data.length; i++) {
                 var marker = new google.maps.Marker({position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng), map: map, title: data[i].name});
-                var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Station Status</b>: "+ data[i].status;
+                var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                 infoWind(marker, content);
             }
             }
