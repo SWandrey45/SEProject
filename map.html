@@ -122,7 +122,7 @@
                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                         }
                         });
-                        var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Station Status</b>: "+ data[i].status;
+                var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                         infoWind(marker, content);
                     }
                  else if ( data[i].available_bikes < 5){
