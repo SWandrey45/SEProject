@@ -64,9 +64,11 @@
                 var station_number = data[i].number;
                 var station_lat = data[i].position_lat;
                 var station_lng = data[i].position_lng;
+		var avail_bikes = data[i].available_bikes;
+                var avail_stands =  data[i].available_bike_stands;                
                 console.log(station_name, station_number, station_address, station_status, station_lat, station_lng);
                     opt = document.createElement('option');
-                    opt.value = data[i].number;
+                    opt.value = [data[i].number, station_name, station_address, station_status, avail_bikes, avail_stands, station_lat, station_lng];
                     opt.innerHTML = data[i].name;
                     sel.appendChild(opt);
             }
@@ -79,15 +81,18 @@
                 var text = stations.options[stations.selectedIndex].innerHTML;
 
                 // alert("Station number is " + value + " and is called " + text);
+		//Splitting the value carried over into different elements to access for variables.
+	     	var splits = value.split(',');
 
 
                 var result = stations.options[stations.selectedIndex].text;
 
-                document.getElementById("info").innerHTML = "Station number: " + value;
+                document.getElementById("info").innerHTML ="<table class='submitTable'><tr><td>Station number: </td><td>" + splits[0] +"</td></tr><tr><td>Station name:</td><td>"+splits[1] +"</td></tr><tr><td> Station Address: </td><td>"+splits[2] +"</td></tr><tr><td>Station Status: </td><td>"+splits[3] +"</td></tr><tr><td>Bikes Available: </td><td>" +splits[4]+"</td></tr><tr><td>Stands available </td><td>"+ splits[5]+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(splits[4])+parseInt(splits[5])) +"</td></tr> </table>";
                  
                 var graph = [["Time", "Available Bikes", "Available Stands"]];
                 for (var i = 0; i < graph_data.length; i++){
-                    if (graph_data[i].number == value){
+			//the value for the number is now stored in the first element of the splits array
+                    if (graph_data[i].number == splits[0]){
                         console.log(graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands)
                         graph.push([graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands]) ;   
                     }
