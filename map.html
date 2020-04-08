@@ -30,6 +30,7 @@
     </body>
         <script>
 
+		var markers = [];
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawChart);
             
@@ -83,6 +84,18 @@
                 // alert("Station number is " + value + " and is called " + text);
 		//Splitting the value carried over into different elements to access for variables.
 	     	var splits = value.split(',');
+		// To make the selected station's marker bounce 
+		for (var i = 0; i < markers.length; i++) {
+	     	    if (markers[i].title == splits[1]){
+	     	        //console.log(markers[i].title);
+	     	        if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
+                        markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                    }
+                    else {
+                    markers[i].setAnimation(null);
+                    }
+	     	    }
+	     	}
 
 
                 var result = stations.options[stations.selectedIndex].text;
@@ -122,8 +135,9 @@
                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                         }
                         });
-                var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                	var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                         infoWind(marker, content);
+			markers.push(marker);
                     }
                  else if ( data[i].available_bikes < 5){
                         let marker = new google.maps.Marker({
@@ -137,6 +151,7 @@
                         });
                		var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                         infoWind(marker, content);
+			markers.push(marker);
                  }
                 else{
                         let marker = new google.maps.Marker({
@@ -150,6 +165,7 @@
                         });
                 	var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                         infoWind(marker, content);
+			markers.push(marker);
                  }
             }
             }
