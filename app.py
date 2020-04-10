@@ -44,7 +44,7 @@ def Menu():
     mycursor.close()
     data_graph = json.dumps(data_graph)
 
-    return render_template('Map_Menu_for_app.html', data=data, data_weather=data_weather, data_graph=data_graph)
+    return render_template('map.html', data=data, data_weather=data_weather, data_graph=data_graph)
 
 if __name__ == "__main__":
     app.run(debug=True)
