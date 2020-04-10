@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset= "utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dublin Bikes</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+
+    <body>
+        <header></header>
+        <ul>
+  <li><a href="http://www.dublinbikes.ie/">Dublin Bikes</a></li>
+  <li><a href="https://www.rsa.ie/en/RSA/Pedestrians-and-Cyclists/Cycling-safety/">Bike Safety Tips</a></li>
+  <li><a href="https://www.visitdublin.com/cycle-dublin-in-a-day">Cycling Route in Dublin</a></li>
+  <li style="float:right"><div class="weather" id="weather"></div></li>
+  <li style="float:right"><img id="pic"></div></li>
+</ul>
+        <h3>Dublin Bikes</h3>
+   <div id="weather"></div>
+        <div id="map"></div>
+        <center>
+    <select class="DDM" id="dropdown"></select>
+        <button class="button button1" onclick="DisplayStationInfo()">Submit</button>
+    <p id="info"></p>
+    <div id="curve_chart"></div>
+            </center>
+
+    </body>
+        <script>
+
+      var markers = [];
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart(d) {
+            var data = google.visualization.arrayToDataTable(d);
+
+            var options = {
+            title: 'Predicted availability at different times',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+            chart.draw(data, options);
+            }
+
+            var sel = document.getElementById('dropdown');
+            var opt = null;
+            var data = JSON.parse({{data | tojson}});
+           var weather = document.getElementById('weather');
+           var w = JSON.parse({{data_weather | tojson}});
+      var iconCode = w[0].icon;
+            document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+            weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
+            var graph_data = JSON.parse({{data_graph | tojson}});
+            //console.log(graph_data);
+            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+                var station_name = data[i].name;
+                var station_address = data[i].address;
+                var station_status = data[i].status;
+                var station_number = data[i].number;
+                var station_lat = data[i].position_lat;
+                var station_lng = data[i].position_lng;
+      var avail_bikes = data[i].available_bikes;
+                var avail_stands =  data[i].available_bike_stands;
+                //console.log(station_name, station_number, station_address, station_status, station_lat, station_lng);
+                    opt = document.createElement('option');
+                    //opt.value = [data[i].number, station_name, station_address, station_status, avail_bikes, avail_stands, station_lat, station_lng];
+                    opt.value = [station_name];
+                    opt.innerHTML = data[i].name;
+                    sel.appendChild(opt);
+            }
+
+            var button = document.getElementById('info');
+             function DisplayStationInfo(){
+
+                var stations = document.getElementById("dropdown");
+                var value = stations.options[stations.selectedIndex].value;
+                var text = stations.options[stations.selectedIndex].innerHTML;
+
+                // alert("Station number is " + value + " and is called " + text);
+      //Splitting the value carried over into different elements to access for variables.
+          //var splits = value.split(',');
+      // To make the selected station's marker bounce
+      for (var i = 0; i < markers.length; i++) {
+              if (markers[i].title == value){
+                  //console.log(markers[i].title);
+                  if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
+                           markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                       }
+                       else {
+                         markers[i].setAnimation(null);
+                      }
+                    }
+          else {
+             markers[i].setAnimation(null);
+          }
+          }
+
+
+                var result = stations.options[stations.selectedIndex].text;
+
+                for (var i = 0; i < data.length; i++) {
+                    if(data[i].name == value){
+                        document.getElementById("info").innerHTML ="<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        //document.getElementById("info").innerHTML ="<table class='submitTable'><tr><td>Station number: </td><td>" + splits[0] +"</td></tr><tr><td>Station name:</td><td>"+splits[1] +"</td></tr><tr><td> Station Address: </td><td>"+splits[2] +"</td></tr><tr><td>Station Status: </td><td>"+splits[3] +"</td></tr><tr><td>Bikes Available: </td><td>" +splits[4]+"</td></tr><tr><td>Stands available </td><td>"+ splits[5]+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(splits[4])+parseInt(splits[5])) +"</td></tr> </table>";
+                        //////////////////////////////
+                        var graph = [["Time", "Available Bikes", "Available Stands"]];
+                        for (var i = 0; i < graph_data.length; i++){
+                    //the value for the number is now stored in the first element of the splits array
+                            //if (graph_data[i].number == splits[0]){
+                            if (graph_data[i].name == value){
+                                //console.log(graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands)
+                                graph.push([graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands]) ;
+                            }
+
+                        }
+                         drawChart(graph)
+                        //////////////////////
+                    }
+                }
+
+                document.getElementById("info").innerHTML ="<table class='submitTable'><tr><td>Station number: </td><td>" + splits[0] +"</td></tr><tr><td>Station name:</td><td>"+splits[1] +"</td></tr><tr><td> Station Address: </td><td>"+splits[2] +"</td></tr><tr><td>Station Status: </td><td>"+splits[3] +"</td></tr><tr><td>Bikes Available: </td><td>" +splits[4]+"</td></tr><tr><td>Stands available </td><td>"+ splits[5]+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(splits[4])+parseInt(splits[5])) +"</td></tr> </table>";
+
+
+             }
+            // Initialize and add the map
+
+
+            function initMap() {
+            // The location of Dublin
+            var dublin = {lat: 53.350140, lng: -6.266155};
+            // The map, centered at Dublin
+            var map = new google.maps.Map(
+            document.getElementById('map'), {zoom: 14, center: dublin});
+            // The marker, positioned at Dublin
+            //var marker = new google.maps.Marker({position: dublin, map: map});
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].available_bikes > 10) {
+                    let marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                        map: map,
+                        title: data[i].name,
+                        icon:
+                        {
+                          url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                        }
+                        });
+                   var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        infoWind(marker, content);
+                     markers.push(marker);
+                     //var loc = {data[i].position_lat, data[i].position_lng};
+                     //var map = new google.maps.Map(document.getElementById('map'), {zoom: 14, center: dublin});
+                    }
+                 else if ( data[i].available_bikes < 5){
+                        let marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                        map: map,
+                        title: data[i].name,
+                        icon:
+                        {
+                          url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                        }
+                        });
+                      var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        infoWind(marker, content);
+         markers.push(marker);
+                 }
+                else{
+                        let marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                        map: map,
+                        title: data[i].name,
+                        icon:
+                        {
+                          url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+                        }
+                        });
+                   var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        infoWind(marker, content);
+         markers.push(marker);
+                 }
+            }
+            }
+
+            function infoWind(marker, info){
+                var infowindow = new google.maps.InfoWindow({content: info});
+
+                marker.addListener('click', function() {
+                infowindow.open(marker.get('map'), marker);
+                //////////////////////////////////////
+                var stations = document.getElementById("dropdown");
+                console.log(marker.title);
+
+
+                for (var i = 0; i < stations.length; i++) {
+                    if (marker.title == stations[i].value){
+                        console.log(stations[i].value);
+                        document.getElementById("dropdown").value = marker.title;
+                        DisplayStationInfo();
+                    }
+                }
+
+
+                });
+            }
+
+
+        </script>
+        <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
+        </script>
+
+</html>
