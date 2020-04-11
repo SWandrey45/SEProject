@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dublin Bikes</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
     </head>
 
     <body>
@@ -23,32 +23,25 @@
         <div id="map"></div>
         <center>
             <select class="DDM" id="dropdown"></select>
-            <select class="DDM" id="dropdown2"></select>
+            <select class="DDM" id="dropdown2">
+                <option value="0">Monday</option>
+                <option value="1">Tuesday</option>
+                <option value="2">Wednesday</option>
+                <option value="3">Thursday</option>
+                <option value="4">Friday</option>
+                <option value="5">Saturday</option>
+                <option value="6">Sunday</option>    
+            </select>
             <button class="button button1" onclick="DisplayStationInfo()">Submit</button>
-            <div id="curve_chart"></div>
         </center>
+        <canvas id="line-chart2"></canvas>
+        <canvas id="line-chart"></canvas>
 
     </body>
     <script>
         //global empty array to contain all the markers once created
         var markers = [];
         var infowindows = [];
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart(d) {
-            var data = google.visualization.arrayToDataTable(d);
-
-            var options = {
-                title: 'Predicted availability at different times',
-                curveType: 'function',
-                legend: { position: 'bottom' }
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-            chart.draw(data, options);
-        }
 
         var sel = document.getElementById('dropdown');
         var opt = null;
@@ -56,12 +49,17 @@
         var weather = document.getElementById('weather');
         var w = JSON.parse({{data_weather | tojson}});
         var iconCode = w[0].icon;
-        var button = document.getElementById('info');
         var graph_data = JSON.parse({{data_graph | tojson}});
-        
+        var graphByDay_data = JSON.parse({{data_graphByDay | tojson}});
+        //Chart.defaults.global.defaultFontColor = 'black';
+        //Chart.defaults.global.defaultFontSize = 16;
+        var graph_bikes = [];
+        var graph_stands = [];
+        var graphByDay_bikes = [];
+        var graphByDay_stands = [];     
+                
         document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
         weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
-        
         
         for (var i = 0; i < data.length; i++) {
             var station_name = data[i].name;
@@ -81,8 +79,9 @@
         function DisplayStationInfo(){
 
             var stations = document.getElementById("dropdown");
+            var days = document.getElementById("dropdown2")
             var value = stations.options[stations.selectedIndex].value;
-            var text = stations.options[stations.selectedIndex].innerHTML;
+            var value2 = days.options[days.selectedIndex].value;
             
             for (var i = 0; i < markers.length; i++) {
                 markers[i].info.close();
@@ -100,21 +99,77 @@
                     markers[i].setAnimation(null);
                 }
             }
-
-            for (var i = 0; i < data.length; i++) {
-                if(data[i].name == value){
-                    var graph = [["Time", "Available Bikes", "Available Stands"]];
-                    for (var i = 0; i < graph_data.length; i++){
-                    
-                        if (graph_data[i].name == value){
-                            graph.push([graph_data[i].time_update, graph_data[i].available_bikes, graph_data[i].available_bike_stands]) ;
+            graph_bikes = graph_data.map(function(e){
+                if (e.name == value){
+                    return e.available_bikes;    
+                } 
+            }).filter(notUndefined => notUndefined !== undefined);
+            graph_stands = graph_data.map(function(e){
+                if (e.name == value){
+                    return e.available_bike_stands;    
+                } 
+            }).filter(notUndefined => notUndefined !== undefined);
+            graphByDay_bikes = graphByDay_data.map(function(e){
+                if (e.name == value && e.weekday == value2){
+                    return e.available_bikes;    
+                } 
+            }).filter(notUndefined => notUndefined !== undefined);
+            graphByDay_stands = graphByDay_data.map(function(e){
+                if (e.name == value && e.weekday == value2){
+                    return e.available_bike_stands;    
+                } 
+            }).filter(notUndefined => notUndefined !== undefined);
+            drawChart();
+        }
+        function drawChart() {
+            new Chart(document.getElementById("line-chart"), {
+                type: 'line',
+                data: {
+                    labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                    datasets: [{
+                        data: graph_bikes,
+                        label: "Available Bikes",
+                        borderColor: "red",
+                        fill: false
+                        }, {
+                        data: graph_stands,
+                        label: "Available Bike Stands",
+                        borderColor: "blue",
+                        fill: false    
                         }
-
+                    ]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: "Predicted Availability at Times of the Day"
                     }
-                    drawChart(graph)
                 }
-            }
-
+            });
+            new Chart(document.getElementById("line-chart2"), {
+                type: 'line',
+                data: {
+                    labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                    datasets: [{
+                        data: graphByDay_bikes,
+                        label: "Available Bikes",
+                        borderColor: "red",
+                        fill: false
+                        }, {
+                        data: graphByDay_stands,
+                        label: "Available Bike Stands",
+                        borderColor: "blue",
+                        fill: false    
+                        }
+                    ]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: "Historic Bike Availability at Station on Selected Day"
+                    }
+                }
+            });
         }
         // Initialize and add the map
         function initMap() {
