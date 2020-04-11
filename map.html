@@ -60,6 +60,8 @@
         var graph_stands = [];
         var graphByDay_bikes = [];
         var graphByDay_stands = [];
+        var chart;
+        var chart2;
 
         document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
         weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
@@ -125,7 +127,8 @@
             drawChart();
         }
         function drawChart() {
-            new Chart(document.getElementById("line-chart"), {
+            if (chart) chart.destroy();
+            chart = new Chart(document.getElementById("line-chart"), {
                 type: 'line',
                 data: {
                     labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
@@ -149,7 +152,8 @@
                     }
                 }
             });
-            new Chart(document.getElementById("line-chart2"), {
+            if (chart2) chart2.destroy();
+            chart2 = new Chart(document.getElementById("line-chart2"), {
                 type: 'line',
                 data: {
                     labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
@@ -173,6 +177,7 @@
                     }
                 }
             });
+            
         }
         // Initialize and add the map
         function initMap() {
