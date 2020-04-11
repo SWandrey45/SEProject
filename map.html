@@ -85,6 +85,7 @@
             var text = stations.options[stations.selectedIndex].innerHTML;
             
             for (var i = 0; i < markers.length; i++) {
+                markers[i].info.close();
                 if (markers[i].title == value){
                     map.setCenter(markers[i].getPosition());
                     markers[i].info.open(markers[i].get('map'), markers[i]);   
@@ -172,12 +173,7 @@
         function infoWind(marker, info){
             marker.info = new google.maps.InfoWindow({content: info});
             marker.addListener('click', function() {
-                marker.info.open(marker.get('map'), marker);
-                
                 var stations = document.getElementById("dropdown");
-                    
-
-
                 for (var i = 0; i < stations.length; i++) {
                     if (marker.title == stations[i].value){
                         console.log(stations[i].value);
@@ -185,8 +181,6 @@
                         DisplayStationInfo();
                     }
                 }
-
-
             });
         }
         </script>
