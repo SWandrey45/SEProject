@@ -17,7 +17,7 @@
             <li style="float:right"><div class="weather" id="weather"></div></li>
             <li style="float:right"><img id="pic"></li>
         </ul>
-        
+
         <h3>Dublin Bikes<img src="static/bike2.png" width="75" height="45"></h3>
         <div id="weather"></div>
         <div id="map"></div>
@@ -30,13 +30,16 @@
                 <option value="3">Thursday</option>
                 <option value="4">Friday</option>
                 <option value="5">Saturday</option>
-                <option value="6">Sunday</option>    
+                <option value="6">Sunday</option>
             </select>
             <button class="button button1" onclick="DisplayStationInfo()">Submit</button>
         </center>
+        <div id="canvasDiv">
         <canvas id="line-chart2"></canvas>
+   </div>
+        <div id="canvasDiv2">
         <canvas id="line-chart"></canvas>
-
+        </div>
     </body>
     <script>
         //global empty array to contain all the markers once created
@@ -56,11 +59,11 @@
         var graph_bikes = [];
         var graph_stands = [];
         var graphByDay_bikes = [];
-        var graphByDay_stands = [];     
-                
+        var graphByDay_stands = [];
+
         document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
         weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
-        
+
         for (var i = 0; i < data.length; i++) {
             var station_name = data[i].name;
             var station_address = data[i].address;
@@ -75,19 +78,19 @@
             opt.innerHTML = data[i].name;
             sel.appendChild(opt);
         }
-        
+
         function DisplayStationInfo(){
 
             var stations = document.getElementById("dropdown");
             var days = document.getElementById("dropdown2")
             var value = stations.options[stations.selectedIndex].value;
             var value2 = days.options[days.selectedIndex].value;
-            
+
             for (var i = 0; i < markers.length; i++) {
                 markers[i].info.close();
                 if (markers[i].title == value){
                     map.setCenter(markers[i].getPosition());
-                    markers[i].info.open(markers[i].get('map'), markers[i]);   
+                    markers[i].info.open(markers[i].get('map'), markers[i]);
                     if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
                            markers[i].setAnimation(google.maps.Animation.BOUNCE);
                     }
@@ -101,23 +104,23 @@
             }
             graph_bikes = graph_data.map(function(e){
                 if (e.name == value){
-                    return e.available_bikes;    
-                } 
+                    return e.available_bikes;
+                }
             }).filter(notUndefined => notUndefined !== undefined);
             graph_stands = graph_data.map(function(e){
                 if (e.name == value){
-                    return e.available_bike_stands;    
-                } 
+                    return e.available_bike_stands;
+                }
             }).filter(notUndefined => notUndefined !== undefined);
             graphByDay_bikes = graphByDay_data.map(function(e){
                 if (e.name == value && e.weekday == value2){
-                    return e.available_bikes;    
-                } 
+                    return e.available_bikes;
+                }
             }).filter(notUndefined => notUndefined !== undefined);
             graphByDay_stands = graphByDay_data.map(function(e){
                 if (e.name == value && e.weekday == value2){
-                    return e.available_bike_stands;    
-                } 
+                    return e.available_bike_stands;
+                }
             }).filter(notUndefined => notUndefined !== undefined);
             drawChart();
         }
@@ -135,7 +138,7 @@
                         data: graph_stands,
                         label: "Available Bike Stands",
                         borderColor: "blue",
-                        fill: false    
+                        fill: false
                         }
                     ]
                 },
@@ -159,7 +162,7 @@
                         data: graphByDay_stands,
                         label: "Available Bike Stands",
                         borderColor: "blue",
-                        fill: false    
+                        fill: false
                         }
                     ]
                 },
@@ -190,7 +193,7 @@
                           url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                         }
                     });
-                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                    var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                     infoWind(marker, content);
                     markers.push(marker);
                 }
@@ -204,7 +207,7 @@
                             url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
                         }
                     });
-                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                     infoWind(marker, content);
                     markers.push(marker);
                  }
@@ -218,7 +221,7 @@
                           url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
                         }
                     });
-                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
                     infoWind(marker, content);
                     markers.push(marker);
                  }
