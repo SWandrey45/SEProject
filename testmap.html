@@ -29,8 +29,8 @@
 
     </body>
         <script>
-
-      var markers = [];
+            //global empty array to contain all the markers once created
+            var markers = [];
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawChart);
 
@@ -89,15 +89,19 @@
       // To make the selected station's marker bounce
       for (var i = 0; i < markers.length; i++) {
               if (markers[i].title == value){
-                  //console.log(markers[i].title);
+                  //Move the centre of the map to the selected marker
+                  map.setCenter(markers[i].getPosition());
+                  //If the selected marker is not already bouncing, make it bounce
                   if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
                            markers[i].setAnimation(google.maps.Animation.BOUNCE);
                        }
                        else {
+                           //If it is alrady bouncing, stop it bouncing
                          markers[i].setAnimation(null);
                       }
                     }
           else {
+              //stop all unselected markers from bouncing
              markers[i].setAnimation(null);
           }
           }
@@ -136,7 +140,8 @@
             // The location of Dublin
             var dublin = {lat: 53.350140, lng: -6.266155};
             // The map, centered at Dublin
-            var map = new google.maps.Map(
+            //var has been removed from in front of map to make it a global variable
+            map = new google.maps.Map(
             document.getElementById('map'), {zoom: 14, center: dublin});
             // The marker, positioned at Dublin
             //var marker = new google.maps.Marker({position: dublin, map: map});
