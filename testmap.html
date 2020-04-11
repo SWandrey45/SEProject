@@ -31,6 +31,8 @@
         <script>
             //global empty array to contain all the markers once created
             var markers = [];
+            //global empty array to contain all the infowindows once created. Used to close unselected infowindows.
+            var infoArray = [];
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawChart);
 
@@ -198,11 +200,14 @@
 
                 marker.addListener('click', function() {
                 infowindow.open(marker.get('map'), marker);
-                //////////////////////////////////////
-                var stations = document.getElementById("dropdown");
-                console.log(marker.title);
-
-
+                // to make any other info windows close if not selected
+                for (var j = 0; j < infoArray.length; j++) {
+                    if (infoArray[j] != infowindow){
+                        infoArray[j].close();                       
+                    }
+                }
+                //To activate select the station from the dropdown menu and activate 'DisplayStationInfo' for it
+                var stations = document.getElementById("dropdown");                
                 for (var i = 0; i < stations.length; i++) {
                     if (marker.title == stations[i].value){
                         console.log(stations[i].value);
