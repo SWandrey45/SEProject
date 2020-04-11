@@ -44,7 +44,17 @@ def Menu():
     mycursor.close()
     data_graph = json.dumps(data_graph)
 
-    return render_template('map.html', data=data, data_weather=data_weather, data_graph=data_graph)
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute("SELECT * FROM SE_Project.GraphByDay;")
+    # data = mycursor.fetchall()
+    data_graphByDay = []
+    for i in mycursor:
+        data_graphByDay.append(dict(i))
+        # print(i)
+    mycursor.close()
+    data_graphByDay = json.dumps(data_graphByDay)
+
+    return render_template('map.html', data=data, data_weather=data_weather, data_graph=data_graph, data_graphByDay=data_graphByDay)
 
 if __name__ == "__main__":
     app.run(debug=True)
