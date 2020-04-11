@@ -70,9 +70,7 @@
                 var station_lng = data[i].position_lng;
       var avail_bikes = data[i].available_bikes;
                 var avail_stands =  data[i].available_bike_stands;
-                //console.log(station_name, station_number, station_address, station_status, station_lat, station_lng);
                     opt = document.createElement('option');
-                    //opt.value = [data[i].number, station_name, station_address, station_status, avail_bikes, avail_stands, station_lat, station_lng];
                     opt.value = [station_name];
                     opt.innerHTML = data[i].name;
                     sel.appendChild(opt);
@@ -85,9 +83,7 @@
                 var value = stations.options[stations.selectedIndex].value;
                 var text = stations.options[stations.selectedIndex].innerHTML;
 
-                // alert("Station number is " + value + " and is called " + text);
-      //Splitting the value carried over into different elements to access for variables.
-          //var splits = value.split(',');
+                
       // To make the selected station's marker bounce
                  //also causes infowindow to pop up.
       for (var i = 0; i < infoArray.length; i++) {
@@ -159,12 +155,12 @@
                         }
                         });
                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                    //var content ="<table class='submitTable'><tr><td>Station number: </td><td>" + data[i].number +"</td></tr><tr><td>Station name:</td><td>"+data[i].name +"</td></tr><tr><td> Station Address: </td><td>"+data[i].address +"</td></tr><tr><td>Station Status: </td><td>"+data[i].status +"</td></tr><tr><td>Bikes Available: </td><td>" +data[i].available_bikes+"</td></tr><tr><td>Stands available </td><td>"+ data[i].available_bike_stands+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(data[i].available_bikes)+parseInt(data[i].available_bike_stands)) +"</td></tr> </table>";
+                        //to display in a table
                     var infowindow = new google.maps.InfoWindow({content: content});
                     infoArray.push({marker: marker, info:infowindow});    
                     infoWind(marker, content);
-                     markers.push(marker);
-                     //var loc = {data[i].position_lat, data[i].position_lng};
-                     //var map = new google.maps.Map(document.getElementById('map'), {zoom: 14, center: dublin});
+                     markers.push(marker);                    
                     }
                  else if ( data[i].available_bikes < 5){
                         let marker = new google.maps.Marker({
@@ -177,6 +173,8 @@
                         }
                         });
                       var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                     //var content ="<table class='submitTable'><tr><td>Station number: </td><td>" + data[i].number +"</td></tr><tr><td>Station name:</td><td>"+data[i].name +"</td></tr><tr><td> Station Address: </td><td>"+data[i].address +"</td></tr><tr><td>Station Status: </td><td>"+data[i].status +"</td></tr><tr><td>Bikes Available: </td><td>" +data[i].available_bikes+"</td></tr><tr><td>Stands available </td><td>"+ data[i].available_bike_stands+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(data[i].available_bikes)+parseInt(data[i].available_bike_stands)) +"</td></tr> </table>";
+                        //to display in a table
                      var infowindow = new google.maps.InfoWindow({content: content});
                      infoArray.push({marker: marker, info:infowindow});   
                      infoWind(marker, content);
@@ -193,6 +191,8 @@
                         }
                         });
                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                   //var content ="<table class='submitTable'><tr><td>Station number: </td><td>" + data[i].number +"</td></tr><tr><td>Station name:</td><td>"+data[i].name +"</td></tr><tr><td> Station Address: </td><td>"+data[i].address +"</td></tr><tr><td>Station Status: </td><td>"+data[i].status +"</td></tr><tr><td>Bikes Available: </td><td>" +data[i].available_bikes+"</td></tr><tr><td>Stands available </td><td>"+ data[i].available_bike_stands+"</td></tr><tr><td>Total stands </td><td>"+(parseInt(data[i].available_bikes)+parseInt(data[i].available_bike_stands)) +"</td></tr> </table>";
+                        //to display in a table
                     var infowindow = new google.maps.InfoWindow({content: content});
                     infoArray.push({marker: marker, info:infowindow});    
                     infoWind(marker, content);
@@ -203,20 +203,13 @@
 
             function infoWind(marker, info){
                 var infowindow = new google.maps.InfoWindow({content: info});
-
+            //on click function for when a marker is clicked
                 marker.addListener('click', function() {
-                infowindow.open(marker.get('map'), marker);
-                // to make any other info windows close if not selected
-                for (var j = 0; j < infoArray.length; j++) {
-                    if (infoArray[j] != infowindow){
-                        infoArray[j].close();                       
-                    }
-                }
+                infowindow.open(marker.get('map'), marker);               
                 //To activate select the station from the dropdown menu and activate 'DisplayStationInfo' for it
                 var stations = document.getElementById("dropdown");                
                 for (var i = 0; i < stations.length; i++) {
-                    if (marker.title == stations[i].value){
-                        console.log(stations[i].value);
+                    if (marker.title == stations[i].value){                        
                         document.getElementById("dropdown").value = marker.title;
                         DisplayStationInfo();
                     }
