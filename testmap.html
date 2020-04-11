@@ -89,24 +89,24 @@
       //Splitting the value carried over into different elements to access for variables.
           //var splits = value.split(',');
       // To make the selected station's marker bounce
-      for (var i = 0; i < markers.length; i++) {
-              if (markers[i].title == value){
-                  //Move the centre of the map to the selected marker
-                  map.setCenter(markers[i].getPosition());
-                  //If the selected marker is not already bouncing, make it bounce
-                  if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
-                           markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                 //also causes infowindow to pop up.
+      for (var i = 0; i < infoArray.length; i++) {
+              if (infoArray[i].marker.title == value){
+              map.setCenter("yes" + infoArray[i].marker.getPosition());
+                  infoArray[i].info.open(infoArray[i].marker.get('map'), infoArray[i].marker);
+                  if (infoArray[i].marker.getAnimation() != google.maps.Animation.BOUNCE) {
+                           infoArray[i].marker.setAnimation(google.maps.Animation.BOUNCE);
                        }
                        else {
-                           //If it is alrady bouncing, stop it bouncing
-                         markers[i].setAnimation(null);
+                         infoArray[i].marker.setAnimation(null);
                       }
                     }
           else {
-              //stop all unselected markers from bouncing
-             markers[i].setAnimation(null);
+              //closes infowindow and stops bouncing on all other markers
+             infoArray[i].marker.setAnimation(null);
+             infoArray[i].info.close();
           }
-          }
+      }
 
 
                 var result = stations.options[stations.selectedIndex].text;
@@ -159,7 +159,9 @@
                         }
                         });
                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                        infoWind(marker, content);
+                    var infowindow = new google.maps.InfoWindow({content: content});
+                    infoArray.push({marker: marker, info:infowindow});    
+                    infoWind(marker, content);
                      markers.push(marker);
                      //var loc = {data[i].position_lat, data[i].position_lng};
                      //var map = new google.maps.Map(document.getElementById('map'), {zoom: 14, center: dublin});
@@ -175,7 +177,9 @@
                         }
                         });
                       var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                        infoWind(marker, content);
+                     var infowindow = new google.maps.InfoWindow({content: content});
+                     infoArray.push({marker: marker, info:infowindow});   
+                     infoWind(marker, content);
          markers.push(marker);
                  }
                 else{
@@ -189,7 +193,9 @@
                         }
                         });
                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Station Number</b>: " + data[i].number + " <b>Station Address</b>: " + data[i].address + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                        infoWind(marker, content);
+                    var infowindow = new google.maps.InfoWindow({content: content});
+                    infoArray.push({marker: marker, info:infowindow});    
+                    infoWind(marker, content);
          markers.push(marker);
                  }
             }
