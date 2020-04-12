@@ -245,6 +245,13 @@
                               url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                             }
                         });
+                        //local variable that contains the information to be displayed in the info window for each marker
+                        var content = "<b>Station Name</b>: " + data[i].name +  "   <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        //Call the infoWind() function to create an info window for the marker passing in the marker and content as parameters
+                        infoWind(marker, content);
+                        //Add the marker to the array of markers
+                        markers.push(marker);
+
                     }
                     //If there are less than 5 available bikes, the marker is coloured red
                     else if ( data[i].available_bikes < 5){
@@ -257,6 +264,12 @@
                                 url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
                             }
                         });
+                        //local variable that contains the information to be displayed in the info window for each marker
+                        var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        //Call the infoWind() function to create an info window for the marker passing in the marker and content as parameters
+                        infoWind(marker, content);
+                        //Add the marker to the array of markers
+                        markers.push(marker);
                     }
                     //Otherwise, the marker is coloured yellow
                     else{
@@ -269,14 +282,14 @@
                               url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
                             }
                         });
+                        //local variable that contains the information to be displayed in the info window for each marker
+                        var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                        //Call the infoWind() function to create an info window for the marker passing in the marker and content as parameters
+                        infoWind(marker, content);
+                        //Add the marker to the array of markers
+                        markers.push(marker);
                     }
-                    //local variable that contains the information to be displayed in the info window for each marker
-                    var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                    //Call the infoWind() function to create an info window for the marker passing in the marker and content as parameters
-                    infoWind(marker, content);
-                    //Add the marker to the array of markers
-                    markers.push(marker);
-                }
+                                    }
             }
             //This function is called by the initMap function to create an info window for each marker on the map. It has two arguments, the marker and info, which is the information to be displayed in the info window        
             function infoWind(marker, info){
@@ -292,9 +305,9 @@
                     }
                 });
             }
-            </script>
-            <!-- script to load the map from google maps -->
-            <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
-            </script>
-        </body>
+        </script>
+        <!-- script to load the map from google maps -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
+        </script>
+    </body>
 </html>
