@@ -95,16 +95,14 @@ background-color: #A8D0E6;
 /* This code effects the prediction charts that appear underneath the drop down menu to make them easier to see and read at the same time */
 #canvasDiv{
     height: 350px;
-    width: 600px;
+    width: 50%;
+    display: inline-block;
+    margin: auto;
     float: left;
-    margin: 50px;
-    padding: 1px;
-
 }
 #canvasDiv2{
     height: 350px;
-    width: 600px;
-    float: right;
-    margin: 50px;
-    padding: 1px;
+    width: 50%;
+    display: inline-block;
+    margin: auto;
 }
