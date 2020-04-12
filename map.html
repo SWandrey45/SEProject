@@ -8,6 +8,9 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
         <!-- Script to load Chart.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
+        <!-- script to load the map from google maps -->
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
+        </script>
     </head>
 
     <body>
@@ -292,10 +295,6 @@
                     }
                 });
             }
-            </script>
-            //script to load the map from google maps
-            <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
             </script>
         </body>
 </html>
