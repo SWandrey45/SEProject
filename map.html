@@ -4,12 +4,15 @@
         <meta charset= "utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Dublin Bikes</title>
+        <!-- Link to the CSS code in static/css/main.css -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <!-- Script to load Chart.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.2.1/Chart.min.js"></script>
     </head>
 
     <body>
         <header></header>
+        <!-- A navigation bar containing links to Dublin Bikes, Road Safety Authority and a website with cycle routes in Dublin. It also contains up-to-date weather information. -->
         <ul>
             <li><a href="http://www.dublinbikes.ie/">Dublin Bikes</a></li>
             <li><a href="https://www.rsa.ie/en/RSA/Pedestrians-and-Cyclists/Cycling-safety/">Bike Safety Tips</a></li>
@@ -17,12 +20,14 @@
             <li style="float:right"><div class="weather" id="weather"></div></li>
             <li style="float:right"><img id="pic"></li>
         </ul>
-
+        <!-- Header for app containing an image - bike2.png-->
         <h3>Dublin Bikes<img src="static/bike2.png" width="75" height="45"></h3>
-        <div id="weather"></div>
+        <!-- Container for the map -->
         <div id="map"></div>
         <center>
+            <!-- dropdown box for all the stations -->
             <select class="DDM" id="dropdown"></select>
+            <!-- dropdown box so user can select a day of the week to view the graph for -->
             <select class="DDM" id="dropdown2">
                 <option value="0">Monday</option>
                 <option value="1">Tuesday</option>
@@ -32,223 +37,265 @@
                 <option value="5">Saturday</option>
                 <option value="6">Sunday</option>
             </select>
+            <!-- after the user selects a station and a day of the week from the dropdown, the submit button will display the graph -->
             <button class="button button1" onclick="DisplayStationInfo()">Submit</button>
         </center>
+        <!-- container for the graph "Historical Bike Availability at Station on Selected Day" -->
         <div id="canvasDiv">
-        <canvas id="line-chart2"></canvas>
-   </div>
-        <div id="canvasDiv2">
-        <canvas id="line-chart"></canvas>
+            <canvas id="line-chart2"></canvas>
         </div>
-    </body>
-    <script>
-        //global empty array to contain all the markers once created
-        var markers = [];
-        var infowindows = [];
-
-        var sel = document.getElementById('dropdown');
-        var opt = null;
-        var data = JSON.parse({{data | tojson}});
-        var weather = document.getElementById('weather');
-        var w = JSON.parse({{data_weather | tojson}});
-        var iconCode = w[0].icon;
-        var graph_data = JSON.parse({{data_graph | tojson}});
-        var graphByDay_data = JSON.parse({{data_graphByDay | tojson}});
-        //Chart.defaults.global.defaultFontColor = 'black';
-        //Chart.defaults.global.defaultFontSize = 16;
-        var graph_bikes = [];
-        var graph_stands = [];
-        var graphByDay_bikes = [];
-        var graphByDay_stands = [];
-        var chart;
-        var chart2;
-
-        document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
-        weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
-
-        for (var i = 0; i < data.length; i++) {
-            var station_name = data[i].name;
-            var station_address = data[i].address;
-            var station_status = data[i].status;
-            var station_number = data[i].number;
-            var station_lat = data[i].position_lat;
-            var station_lng = data[i].position_lng;
-            var avail_bikes = data[i].available_bikes;
-            var avail_stands =  data[i].available_bike_stands;
-            opt = document.createElement('option');
-            opt.value = [station_name];
-            opt.innerHTML = data[i].name;
-            sel.appendChild(opt);
-        }
-
-        function DisplayStationInfo(){
-
-            var stations = document.getElementById("dropdown");
-            var days = document.getElementById("dropdown2")
-            var value = stations.options[stations.selectedIndex].value;
-            var value2 = days.options[days.selectedIndex].value;
-
-            for (var i = 0; i < markers.length; i++) {
-                markers[i].info.close();
-                if (markers[i].title == value){
-                    map.setCenter(markers[i].getPosition());
-                    markers[i].info.open(markers[i].get('map'), markers[i]);
-                    if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
-                           markers[i].setAnimation(google.maps.Animation.BOUNCE);
+        <!-- container for the graph "Predicted Availability at Times of the Day" -->
+        <div id="canvasDiv2">
+            <canvas id="line-chart"></canvas>
+        </div>
+        <script>
+            //global empty array to contain all the markers once created
+            var markers = [];
+            //global variable to represent the stations dropdown
+            var sel = document.getElementById('dropdown');
+            //global variable to represent the days dropdown
+            var days = document.getElementById("dropdown2");
+            //global variable to represent the option selected in the stations dropdown originally assigened a null value
+            var opt = null;
+            //global variable which contains the up-to-date JSON data for each station
+            var data = JSON.parse({{data | tojson}});
+            //global variable that represents the container for weather data
+            var weather = document.getElementById('weather');
+            //global variable which contains the up-to-date weather information
+            var w = JSON.parse({{data_weather | tojson}});
+            //global variable that contains the icon code for the weather picture in the nav bar
+            var iconCode = w[0].icon;
+            //global variable that contains the JSON data to be used to draw the graph "Predicted Availability at Times of the Day"
+            var graph_data = JSON.parse({{data_graph | tojson}});
+            //global variable that contains the JSON data to be used to draw the graph "Historical Bike Availability at Station on Selected Day"
+            var graphByDay_data = JSON.parse({{data_graphByDay | tojson}});
+            //global variable that will contain available bikes data for graph "Predicted Availability at Times of the Day"
+            var graph_bikes = [];
+            //global variable that will contain available stands data for graph "Predicted Availability at Times of the Day"
+            var graph_stands = [];
+            //global variable that will contain available bikes data for graph "Historical Bike Availability at Station on Selected Day"
+            var graphByDay_bikes = [];
+            //global variable that will contain available stands data for graph "Historical Bike Availability at Station on Selected Day"
+            var graphByDay_stands = [];
+            //global variable representing the graph "Predicted Availability at Times of the Day"
+            var chart;
+            //global variable representing the graph "Historical Bike Availability at Station on Selected Day"
+            var chart2;
+            
+            //setting the source for the weather picture that appears in the navigation bar
+            document.getElementById("pic").src = "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+            //setting the inner HTML for the weather information displayed in the navigation bar
+            weather.innerHTML = "<b>Temperature</b>: " + w[0].temp + "˚C" + " <b>Humidity</b>: " + w[0].humidity + "%" + " <b>Description</b>: " + w[0].description + " <b>Wind Speed</b>: " + w[0].wind_speed+"m/s";
+            
+            //for loop, looping through the up-to-date bike availability data, used to populate the station dropbox
+            for (var i = 0; i < data.length; i++) {
+                //local variable assigned to the station name of each row
+                var station_name = data[i].name;
+                //creating a new option element and assigning it to opt
+                opt = document.createElement('option');
+                //setting the value attribute of opt to station name
+                opt.value = [station_name];
+                //setting the inner HTML of opt to the station name
+                opt.innerHTML = data[i].name;
+                //appending each option to the dropdown select tag
+                sel.appendChild(opt);
+            }
+            
+            //function that displays the station information on the map and the graphs. This function is called when a marker is clicked on the map or when the submit button is clicked
+            function DisplayStationInfo(){
+                
+                //local variable to retrieve the currently selected option in the stations dropdown
+                var value = sel.options[sel.selectedIndex].value;
+                //local variable to retrieve the currently selected option in the days dropdown
+                var value2 = days.options[days.selectedIndex].value;
+                
+                //for loop, looping through the array of markers that are created on the page load
+                for (var i = 0; i < markers.length; i++) {
+                    //close the info window for each marker
+                    markers[i].info.close();
+                    //if statement that checks if the marker corresponds to the station selected in the stations dropdown
+                    if (markers[i].title == value){
+                        //centre the map to the station selected in stations dropdown
+                        map.setCenter(markers[i].getPosition());
+                        //open the info window for the station selected in stations dropdown
+                        markers[i].info.open(markers[i].get('map'), markers[i]);
+                        //if statement that checks whether the marker is not currently bouncing on the map
+                        if (markers[i].getAnimation() != google.maps.Animation.BOUNCE) {
+                            //make marker bounce if not currently bouncing        
+                            markers[i].setAnimation(google.maps.Animation.BOUNCE);
+                        }
+                        else {
+                            //If marker already bouncing on map, stop it bouncing
+                            markers[i].setAnimation(null);
+                        }
                     }
                     else {
+                        //if marker is not for station selected in dropdown, the marker should not bounce
                         markers[i].setAnimation(null);
                     }
                 }
-                else {
-                    markers[i].setAnimation(null);
-                }
+                //assigns an array of bike availability that is obtained from graph_data. graph_data contains the average available bikes grouped by station and hour of the day 
+                graph_bikes = graph_data.map(function(e){
+                    if (e.name == value){
+                        return e.available_bikes;
+                    }
+                }).filter(notUndefined => notUndefined !== undefined);
+                //assigns an array of stand availability that is obtained from graph_data. graph_data contains the average available stands grouped by station and hour of the day
+                graph_stands = graph_data.map(function(e){
+                    if (e.name == value){
+                        return e.available_bike_stands;
+                    }
+                }).filter(notUndefined => notUndefined !== undefined);
+                //assigns an array of bike availability that is obtained from graphByDay_data. graphByDay_data contains the average available bikes grouped by station, hour of the day and day of the week
+                graphByDay_bikes = graphByDay_data.map(function(e){
+                    if (e.name == value && e.weekday == value2){
+                        return e.available_bikes;
+                    }
+                }).filter(notUndefined => notUndefined !== undefined);
+                //assigns an array of stand availability that is obtained from graphByDay_data. graphByDay_data contains the average available stands grouped by station, hour of the day and day of the week
+                graphByDay_stands = graphByDay_data.map(function(e){
+                    if (e.name == value && e.weekday == value2){
+                        return e.available_bike_stands;
+                    }
+                }).filter(notUndefined => notUndefined !== undefined);
+                //calling the drawChart() function to draw the two graphs
+                drawChart();
             }
-            graph_bikes = graph_data.map(function(e){
-                if (e.name == value){
-                    return e.available_bikes;
-                }
-            }).filter(notUndefined => notUndefined !== undefined);
-            graph_stands = graph_data.map(function(e){
-                if (e.name == value){
-                    return e.available_bike_stands;
-                }
-            }).filter(notUndefined => notUndefined !== undefined);
-            graphByDay_bikes = graphByDay_data.map(function(e){
-                if (e.name == value && e.weekday == value2){
-                    return e.available_bikes;
-                }
-            }).filter(notUndefined => notUndefined !== undefined);
-            graphByDay_stands = graphByDay_data.map(function(e){
-                if (e.name == value && e.weekday == value2){
-                    return e.available_bike_stands;
-                }
-            }).filter(notUndefined => notUndefined !== undefined);
-            drawChart();
-        }
-        function drawChart() {
-            if (chart) chart.destroy();
-            chart = new Chart(document.getElementById("line-chart"), {
-                type: 'line',
-                data: {
-                    labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-                    datasets: [{
-                        data: graph_bikes,
-                        label: "Available Bikes",
-                        borderColor: "red",
-                        fill: false
-                        }, {
-                        data: graph_stands,
-                        label: "Available Bike Stands",
-                        borderColor: "blue",
-                        fill: false
+            //This function gets called by the DisplayStationInfo() function. The DisplayStationInfo() function is called every time a marker is clicked or the submit button is clicked 
+            function drawChart() {
+                //if there is already a chart, destroy the old chart
+                if (chart) chart.destroy();
+                //set chart variable to a new chart that will be contained in the canvas tag with id "line-chart"
+                chart = new Chart(document.getElementById("line-chart"), {
+                    type: 'line',
+                    data: {
+                        //label for each hour of the day
+                        labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                        datasets: [{
+                            //graph_bikes was updated in the DisplayStationInfo() function
+                            data: graph_bikes,
+                            label: "Available Bikes",
+                            borderColor: "red",
+                            fill: false
+                            }, {
+                            //graph_stands was updated in the DisplayStationInfo() function
+                            data: graph_stands,
+                            label: "Available Bike Stands",
+                            borderColor: "blue",
+                            fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: "Predicted Availability at Times of the Day"
                         }
-                    ]
-                },
-                options: {
-                    title: {
-                        display: true,
-                        text: "Predicted Availability at Times of the Day"
                     }
-                }
-            });
-            if (chart2) chart2.destroy();
-            chart2 = new Chart(document.getElementById("line-chart2"), {
-                type: 'line',
-                data: {
-                    labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
-                    datasets: [{
-                        data: graphByDay_bikes,
-                        label: "Available Bikes",
-                        borderColor: "red",
-                        fill: false
-                        }, {
-                        data: graphByDay_stands,
-                        label: "Available Bike Stands",
-                        borderColor: "blue",
-                        fill: false
+                });
+                //If there is already a chart, delete the old chart
+                if (chart2) chart2.destroy();
+                //set chart2 variable to a new chart that will be contained in the canvas tag with id "line-chart2"
+                chart2 = new Chart(document.getElementById("line-chart2"), {
+                    type: 'line',
+                    data: {
+                        labels: ["0:00", '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'],
+                        datasets: [{
+                            //graphByDay_bikes was updated in the DisplayStationInfo() function
+                            data: graphByDay_bikes,
+                            label: "Available Bikes",
+                            borderColor: "red",
+                            fill: false
+                            }, {
+                            //graphByDay_stands was updated in the DisplayStationInfo() function
+                            data: graphByDay_stands,
+                            label: "Available Bike Stands",
+                            borderColor: "blue",
+                            fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        title: {
+                            display: true,
+                            text: "Historic Bike Availability at Station on Selected Day"
                         }
-                    ]
-                },
-                options: {
-                    title: {
-                        display: true,
-                        text: "Historic Bike Availability at Station on Selected Day"
                     }
-                }
-            });
+                });
+
+            }
+            // Initialize and add the map, called on page load
+            function initMap() {
+                // The location of Dublin
+                var dublin = {lat: 53.350140, lng: -6.266155};
+                // The map, centered at Dublin
+                map = new google.maps.Map(
+                document.getElementById('map'), {zoom: 14, center: dublin});
             
-        }
-        // Initialize and add the map
-        function initMap() {
-            // The location of Dublin
-            var dublin = {lat: 53.350140, lng: -6.266155};
-            // The map, centered at Dublin
-            map = new google.maps.Map(
-            document.getElementById('map'), {zoom: 14, center: dublin});
-            // The marker, positioned at Dublin
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].available_bikes > 10) {
-                    let marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
-                        map: map,
-                        title: data[i].name,
-                        icon:
-                        {
-                          url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                        }
-                    });
-                    var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                    infoWind(marker, content);
-                    markers.push(marker);
-                }
-                else if ( data[i].available_bikes < 5){
-                    let marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
-                        map: map,
-                        title: data[i].name,
-                        icon:
-                        {
-                            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                        }
-                    });
-                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                    infoWind(marker, content);
-                    markers.push(marker);
-                 }
-                 else{
-                    let marker = new google.maps.Marker({
-                        position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
-                        map: map,
-                        title: data[i].name,
-                        icon:
-                        {
-                          url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
-                        }
-                    });
-                    var content = "<b>Station Name</b>: " + data[i].name + " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " +  data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
-                    infoWind(marker, content);
-                    markers.push(marker);
-                 }
-            }
-        }
-
-        function infoWind(marker, info){
-            marker.info = new google.maps.InfoWindow({content: info});
-            marker.addListener('click', function() {
-                var stations = document.getElementById("dropdown");
-                for (var i = 0; i < stations.length; i++) {
-                    if (marker.title == stations[i].value){
-                        console.log(stations[i].value);
-                        document.getElementById("dropdown").value = marker.title;
-                        DisplayStationInfo();
+                //for loop to create a marker on the map for each station
+                for (var i = 0; i < data.length; i++) {
+                    //If there are more than 10 available bikes at the station the marker is coloured green
+                    if (data[i].available_bikes > 10) {
+                        let marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                            map: map,
+                            title: data[i].name,
+                            icon:
+                            {
+                              url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                            }
+                        });
                     }
+                    //If there are less than 5 available bikes, the marker is coloured red
+                    else if ( data[i].available_bikes < 5){
+                        let marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                            map: map,
+                            title: data[i].name,
+                            icon:
+                            {
+                                url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                            }
+                        });
+                    }
+                    //Otherwise, the marker is coloured yellow
+                    else{
+                        let marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(data[i].position_lat, data[i].position_lng),
+                            map: map,
+                            title: data[i].name,
+                            icon:
+                            {
+                              url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+                            }
+                        });
+                    }
+                    //local variable that contains the information to be displayed in the info window for each marker
+                    var content = "<b>Station Name</b>: " + data[i].name +  " <b>Available Bikes</b>: " + data[i].available_bikes + " <b>Available Stands</b>: " + data[i].available_bike_stands + " <b>Total Stands</b>: " + data[i].bike_stands + " <b>Station Status</b>: "+ data[i].status;
+                    //Call the infoWind() function to create an info window for the marker passing in the marker and content as parameters
+                    infoWind(marker, content);
+                    //Add the marker to the array of markers
+                    markers.push(marker);
                 }
-            });
-        }
-        </script>
-        <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
-        </script>
-
+            }
+            //This function is called by the initMap function to create an info window for each marker on the map. It has two arguments, the marker and info, which is the information to be displayed in the info window        
+            function infoWind(marker, info){
+                //set the info attribute of marker to be a new info window with content = info
+                marker.info = new google.maps.InfoWindow({content: info});
+                //add a listener to the marker so that when it is clicked the stations dropdown is updated to the corresponding station and the DisplayStationInfo() function is called. The DisplayStationsInfo() function will then display the info window for the marker. 
+                marker.addListener('click', function() {
+                    for (var i = 0; i < sel.length; i++) {
+                        if (marker.title == sel[i].value){
+                            sel.value = marker.title;
+                            DisplayStationInfo();
+                        }
+                    }
+                });
+            }
+            </script>
+            //script to load the map from google maps
+            <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK5Gvdq9S9U2KtsWFbMEZRKzFwKSdhgc&callback=initMap">
+            </script>
+        </body>
 </html>
