@@ -63,7 +63,7 @@ def dynamic_bikes(text):
         engine.execute("insert into DynamicBike values(%s, %s, %s, %s, %s, %s, %s, %s)", vals)
         # execute SQL query to insert row into BikeWeather for graphs
         engine.execute("""insert into BikeWeather2
-                            select """ + str(DynamicBike.get('number')) + ", CURDATE(), CURTIME(), w.description, w.date_update + INTERVAL time_to_sec(w.time_update) second, 0, " + str(DynamicBike.get('available_bikes')) + ", " + str(DynamicBike.get('available_bike_stands')) + ', "' + DynamicBike.get("name") + '''"
+                            select """ + str(DynamicBike.get('number')) + ", CURDATE(), CURTIME(), w.description, w.date_update + INTERVAL time_to_sec(w.time_update) second, 0, " + str(DynamicBike.get('available_bikes')) + ", " + str(DynamicBike.get('available_bike_stands')) + ', "' + DynamicBike.get("name") + '", weekday(CURDATE()), least(time_to_sec(CURTIME()) div (60*60), 23)' + '''
                             from SE_Project.Weather w, (select max(date_update + INTERVAL time_to_sec(time_update) second) as updated from SE_Project.Weather) as w1
                             where w.date_update + INTERVAL time_to_sec(w.time_update) second = w1.updated''')
                         
